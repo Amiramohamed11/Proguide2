@@ -1,0 +1,82 @@
+import axios from 'axios';
+import { 
+  mockServices, 
+  mockHeroSettings, 
+  mockTestimonials, 
+  mockFaq 
+} from '../data/mockData';
+
+// الرابط الأساسي (تأكدي من وجود الفاصلة المنقوطة في النهاية)
+const API_BASE_URL = 'http://localhost/api/v1'; 
+
+// --- 1. تعريف أنواع البيانات (Interfaces) ---
+
+export interface Service {
+  id: number;
+  title: string;
+  description: string;
+  features: string[];
+  image: string | null;
+  button_text: string;
+  button_url: string | null;
+  order: number;
+}
+
+export interface HeroSettings {
+  hero: {
+    title: string;
+    subtitle: string;
+    button_text: string;
+    button_url: string;
+    background_image: string | null;
+  };
+  home_visit: {
+    title: string;
+    description: string;
+    button_text: string;
+    button_url: string;
+    image: string | null;
+  };
+}
+
+// --- 2. الدوال البرمجية (Functions) ---
+
+export const getSettings = async (): Promise<HeroSettings> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/settings`);
+    return response.data.data;
+  } catch (error) {
+    console.error("Fetch Settings Error:", error);
+    return mockHeroSettings; 
+  }
+};
+
+export const getServices = async (): Promise<Service[]> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/services`);
+    return response.data.data;
+  } catch (error) {
+    console.error("Fetch Services Error:", error);
+    return mockServices.data;
+  }
+};
+
+export const getTestimonials = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/testimonials`);
+    return response.data.data;
+  } catch (error) {
+    console.error("Fetch Testimonials Error:", error);
+    return mockTestimonials.data;
+  }
+};
+
+export const getFaq = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/faq`);
+    return response.data.data;
+  } catch (error) {
+    console.error("Fetch FAQ Error:", error);
+    return mockFaq.data;
+  }
+};
