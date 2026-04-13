@@ -12,6 +12,7 @@ import Reviews from './components/Reviews';
 import FAQ from './components/FAQ';
 import ContactForm from './components/ContactForm';
 import Footer from './components/Footer';
+import HomeVisitSection from './components/HomeVisitSection';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         <Services />
         <Gallery />
         <Reviews />
+        <HomeVisitSection/>
         <FAQ />
         <ContactForm />
       </main>

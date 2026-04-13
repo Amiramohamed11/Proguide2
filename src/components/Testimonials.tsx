@@ -1,16 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Star } from 'lucide-react';
 import { api, Testimonial } from '../lib/api';
 
 const Testimonials = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
         const response = await api.getTestimonials();
-        setTestimonials(response);
+        
+        /**
+         * حل مشكلة Property 'data' does not exist:
+         * نقوم بفحص ما إذا كانت الاستجابة مصفوفة مباشرة أو تحتوي على حقل data
+         */
+        const data = Array.isArray(response) ? response : (response as any).data;
+        
+        if (data) {
+          setTestimonials(data);
+        }
       } catch (error) {
         console.error("Failed to fetch testimonials", error);
       } finally {
@@ -20,50 +31,100 @@ const Testimonials = () => {
     fetchTestimonials();
   }, []);
 
+  // تحريك السلايدر تلقائياً كل 5 ثوانٍ
+  useEffect(() => {
+    if (testimonials.length > 1) {
+      const timer = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+      }, 5000);
+      return () => clearInterval(timer);
+    }
+  }, [testimonials]);
+
+  if (loading) {
+    return (
+      <section className="py-24 bg-gradient-to-b from-[#53b9ff] via-[#48afff] to-[#5ec1ff] flex justify-center items-center min-h-[500px]">
+        <div className="animate-pulse flex flex-col items-center space-y-4">
+          <div className="h-8 bg-white/20 rounded w-64"></div>
+          <div className="h-20 bg-white/20 rounded w-96"></div>
+        </div>
+      </section>
+    );
+  }
+
+  if (testimonials.length === 0) return null;
+
+  const current = testimonials[currentIndex];
+
   return (
-    <section className="py-24 bg-slate-900 text-white text-center">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h3 className="text-3xl font-bold mb-8">Das sagen unsere Patienten</h3>
+    <section className="py-24 bg-gradient-to-b from-[#53b9ff] via-[#48afff] to-[#5ec1ff] text-white overflow-hidden min-h-[600px] flex items-center">
+      <div className="max-w-4xl mx-auto px-6 w-full flex flex-col items-center text-center">
         
-        {loading ? (
-          <div className="animate-pulse flex flex-col items-center">
-            <div className="h-16 bg-white/20 rounded w-full mb-10"></div>
-            <div className="w-20 h-20 bg-white/20 rounded-full mb-4"></div>
-            <div className="h-6 bg-white/20 rounded w-32"></div>
-          </div>
-        ) : (
-          testimonials.map((testimonial) => (
+        <h2 className="text-3xl md:text-5xl font-bold mb-16 tracking-tight">
+          Das sagen unsere Patienten
+        </h2>
+
+        {/* حاوية السلايدر المتحرك */}
+        <div className="relative w-full h-[350px] md:h-[280px] flex justify-center">
+          <AnimatePresence mode="wait">
             <motion.div
-              key={testimonial.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="mb-16 last:mb-0"
+              key={current.id}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
+              className="absolute inset-0 flex flex-col items-center"
             >
-              <blockquote className="text-xl md:text-2xl italic mb-10 leading-relaxed">
-                „{testimonial.content}“
+              {/* نص المراجعة */}
+              <blockquote className="text-lg md:text-2xl font-light italic leading-relaxed max-w-3xl mb-10 opacity-95">
+                „{current.content}“
               </blockquote>
-              
+
+              {/* البروفايل: الصورة والاسم والنجوم */}
               <div className="flex flex-col items-center">
-                <img 
-                  src={testimonial.image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100"} 
-                  alt={testimonial.patient_name} 
-                  className="w-20 h-20 rounded-full border-4 border-white/20 mb-4 object-cover"
-                  referrerPolicy="no-referrer"
+                <img
+                  src={current.image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100"}
+                  alt={current.patient_name}
+                  className="w-16 h-16 rounded-full border-4 border-white/20 object-cover shadow-2xl mb-4"
                 />
-                <div className="font-bold text-lg">{testimonial.patient_name}</div>
-                <div className="flex gap-1 mt-2">
+                
+                <cite className="not-italic font-semibold text-lg tracking-wider">
+                  {current.patient_name}
+                </cite>
+
+                {/* النجوم مع المسافة المطلوبة mt-6 */}
+                <div className="flex items-center gap-1.5 mt-6">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <span key={i} className={`text-xl ${i < testimonial.rating ? 'text-yellow-400' : 'text-slate-300'}`}>
-                      ★
-                    </span>
+                    <Star
+                      key={i}
+                      className={`w-5 h-5 ${
+                        i < current.rating ? 'fill-yellow-400 text-yellow-400' : 'text-white/30'
+                      }`}
+                    />
                   ))}
                 </div>
+                
+                {/* الخط السفلي الجمالي */}
+                <div className="w-12 h-0.5 bg-white/40 mt-4 rounded-full"></div>
               </div>
             </motion.div>
-          ))
-        )}
+          </AnimatePresence>
+        </div>
+
+        {/* نقاط التنقل (Dots) */}
+        <div className="flex gap-3 mt-16">
+          {testimonials.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`transition-all duration-300 rounded-full h-1.5 ${
+                index === currentIndex 
+                ? "w-10 bg-slate-900" 
+                : "w-4 bg-slate-900/20 hover:bg-slate-900/40"
+              }`}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

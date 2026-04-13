@@ -123,17 +123,17 @@ export const getFaq = async (): Promise<FAQItem[]> => {
   }
 };
 
-// export const getReviews = async (): Promise<Review[]> => {
-//   try {
-//     const response = await axios.get(`${API_BASE_URL}/Reviews`);
-//     const data = response.data.data || response.data;
+export const getReviews = async (): Promise<Review[]> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/Reviews`);
+    const data = response.data.data || response.data;
 
-//     return Array.isArray(data) ? data : (data.reviews || []);
-//   } catch (error) {
-//     console.error("API Error - Reviews:", error);
-//     return [];
-//   }
-// };
+    return Array.isArray(data) ? data : (data.reviews || []);
+  } catch (error) {
+    console.error("API Error - Reviews:", error);
+    return [];
+  }
+};
 
 export const submitContactForm = async (formData: {
   name: string;
@@ -157,6 +157,6 @@ export const api = {
   getTestimonials,
   getGallery,
   getFaq,
-//  getReviews,
+ getReviews,
   submitContactForm
 };

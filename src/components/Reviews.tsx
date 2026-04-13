@@ -1,89 +1,131 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Star } from 'lucide-react';
-import { api } from '../lib/api';
-
-interface Review {
-  id: number;
-  title: string;
-  content: string;
-  author: string;
-  rating: number;
-  order: number;
-}
-
-interface ReviewResponse {
-  data: Review[];
-}
+import { api, Testimonial } from '../lib/api';
 
 const Reviews = () => {
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  // useEffect(() => {
-  //   const fetchReviews = async () => {
-  //     try {
-  //       const response = await api.getReviews() as unknown as ReviewResponse;
-  //       setReviews(Array.isArray(response.data) ? response.data : []);
-  //     } catch (error) {
-  //       console.error("Failed to fetch reviews", error);
-  //       setReviews([]);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchReviews();
-  // }, []);
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const response = await api.getTestimonials();
+        
+        /**
+         * حل مشكلة Property 'data' does not exist:
+         * إذا كان الـ API يرجع المصفوفة مباشرة نستخدمها، 
+         * وإذا كانت مغلفة داخل كائن data نصل إليها بأمان.
+         */
+        const data = Array.isArray(response) ? response : (response as any).data;
+        
+        if (data && Array.isArray(data)) {
+          setTestimonials(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch testimonials", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTestimonials();
+  }, []);
 
-  // return (
-  //   <section className="py-24 px-6 bg-slate-50 font-sans">
-  //     <div className="max-w-6xl mx-auto">
-  //       <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-slate-800">
-  //         Das sagen unsere Kunden
-  //       </h2>
-  //       <p className="text-center text-slate-600 mb-16">Erfahren Sie, was Patienten über unsere Dienstleistungen denken</p>
+  // التبديل التلقائي للمراجعات
+  useEffect(() => {
+    if (testimonials.length > 1) {
+      const timer = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+      }, 5000);
+      return () => clearInterval(timer);
+    }
+  }, [testimonials]);
 
-  //       {loading ? (
-  //         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  //           {[1, 2, 3].map((i) => (
-  //             <div key={i} className="animate-pulse bg-white rounded-lg p-6 h-64"></div>
-  //           ))}
-  //         </div>
-  //       ) : reviews.length === 0 ? (
-  //         <p className="text-center text-slate-600 py-12">Es gibt noch keine Bewertungen</p>
-  //       ) : (
-  //         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  //           {reviews.map((review) => (
-  //             <motion.div
-  //               key={review.id}
-  //               initial={{ opacity: 0, y: 20 }}
-  //               whileInView={{ opacity: 1, y: 0 }}
-  //               viewport={{ once: true }}
-  //               transition={{ duration: 0.5 }}
-  //               className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow border border-slate-200"
-  //             >
-  //               <div className="flex items-center gap-1 mb-4">
-  //                 {Array.from({ length: 5 }).map((_, i) => (
-  //                   <Star
-  //                     key={i}
-  //                     className={`w-4 h-4 ${
-  //                       i < review.rating
-  //                         ? 'fill-yellow-400 text-yellow-400'
-  //                         : 'text-slate-300'
-  //                     }`}
-  //                   />
-  //                 ))}
-  //               </div>
-  //               <h3 className="text-lg font-semibold text-slate-800 mb-2">{review.title}</h3>
-  //               <p className="text-slate-600 mb-4 line-clamp-3">{review.content}</p>
-  //               <p className="text-sm text-slate-500">— {review.author}</p>
-  //             </motion.div>
-  //           ))}
-  //         </div>
-  //       )}
-  //     </div>
-  //   </section>
-  // );
+  if (loading) {
+    return (
+      <section className="py-24 bg-gradient-to-b from-[#53b9ff] via-[#48afff] to-[#5ec1ff] min-h-[500px] flex items-center justify-center">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="h-8 bg-white/20 rounded w-64"></div>
+          <div className="h-32 bg-white/20 rounded w-80"></div>
+        </div>
+      </section>
+    );
+  }
+
+  if (testimonials.length === 0) return null;
+
+  const current = testimonials[currentIndex];
+
+  return (
+    <section className="py-24 bg-gradient-to-b from-[#53b9ff] via-[#48afff] to-[#5ec1ff] text-white overflow-hidden min-h-[600px] flex items-center">
+      <div className="max-w-4xl mx-auto px-6 w-full flex flex-col items-center text-center">
+        
+        {/* العنوان */}
+        <h2 className="text-3xl md:text-5xl font-bold mb-16 tracking-tight">
+          Das sagen unsere Patienten
+        </h2>
+
+        {/* السلايدر المتحرك */}
+        <div className="relative w-full h-[350px] md:h-[280px] flex justify-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current.id}
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -40 }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
+              className="absolute inset-0 flex flex-col items-center"
+            >
+              <blockquote className="text-lg md:text-2xl font-light italic leading-relaxed max-w-3xl mb-10 opacity-95">
+                „{current.content}“
+              </blockquote>
+
+              <div className="flex flex-col items-center">
+                <img
+                  src={current.image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100"}
+                  alt={current.patient_name}
+                  className="w-16 h-16 rounded-full border-4 border-white/20 object-cover shadow-2xl mb-4"
+                />
+                
+                <cite className="not-italic font-semibold text-lg tracking-wider">
+                  {current.patient_name}
+                </cite>
+
+                {/* النجوم مع مسافة mt-6 والخط السفلي */}
+                <div className="flex items-center gap-1.5 mt-6">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-5 h-5 ${
+                        i < (current.rating || 5) ? 'fill-yellow-400 text-yellow-400' : 'text-white/30'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <div className="w-12 h-0.5 bg-white/40 mt-4 rounded-full"></div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* نقاط التحكم Dots */}
+        <div className="flex gap-3 mt-16">
+          {testimonials.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`transition-all duration-300 rounded-full h-1.5 ${
+                index === currentIndex 
+                ? "w-10 bg-slate-900" 
+                : "w-4 bg-slate-900/20 hover:bg-slate-900/40"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 };
 
 export default Reviews;
