@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, Variants } from 'framer-motion';
+import { motion, type Variants } from 'motion/react';
 import { api, GalleryItem } from '../lib/api';
 
 // Fallback images
@@ -49,11 +49,14 @@ const Gallery: React.FC = () => {
   }, []);
 
   return (
-    <section className="py-24 bg-slate-50 px-6 font-sans">
-      <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-slate-800">
-          Bildergalerie
-        </h2>
+    <section className="bg-slate-50 px-6 py-24 font-sans">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-16 text-center">
+          <h2 className="font-display text-3xl font-bold uppercase tracking-wider text-navy md:text-4xl">
+            Bildergalerie
+          </h2>
+          <div className="mx-auto mt-4 h-1 w-20 bg-sky" />
+        </div>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[250px]">

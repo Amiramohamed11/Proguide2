@@ -1,18 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
-import { api } from '../lib/api';
-
-interface FAQItem {
-  id: number;
-  question: string;
-  answer: string;
-  order: number;
-}
-
-interface FAQResponse {
-  data: FAQItem[];
-}
+import { api, FAQItem } from '../lib/api'; 
+import PageHero from './PageHero';
+import ContactForm from './ContactForm';
 
 const FAQ: React.FC = () => {
   const [faqItems, setFaqItems] = useState<FAQItem[]>([]);
@@ -22,10 +13,12 @@ const FAQ: React.FC = () => {
   useEffect(() => {
     const fetchFAQ = async () => {
       try {
-        const response = await api.getFaq() as unknown as FAQResponse;
-        setFaqItems(response.data);
+        const data = await api.getFaq();
+        if (data) {
+          setFaqItems(data);
+        }
       } catch (error) {
-        console.error("Failed to fetch FAQ", error);
+        console.error('Failed to fetch FAQ', error);
       } finally {
         setLoading(false);
       }
@@ -34,63 +27,86 @@ const FAQ: React.FC = () => {
   }, []);
 
   return (
-    <section className="py-24 bg-slate-50 px-6 font-sans">
-      {/* <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-slate-800">
-          Häufig gestellte Fragen
-        </h2>
-        <p className="text-center text-slate-600 mb-16">Finden Sie Antworten auf die häufigsten Fragen</p>
+    // تم إضافة font-asul هنا لتطبيق الخط على كامل الصفحة
+    <div className="bg-white font-asul overflow-x-hidden">
+      {/* قسم الهيرو العلوي */}
+      <PageHero 
+        title="FAQ" 
+      />
 
-        {loading ? (
-          <div className="space-y-4">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="animate-pulse bg-slate-200 rounded-lg h-16"></div>
-            ))}
-          </div>
-        ) : 
-        (
-          <div className="space-y-4">
-            {faqItems.length === 0 ? (
-              <p className="text-center text-slate-600">Es gibt noch keine FAQs</p>
-            ) : (
-              faqItems.map((item) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden"
-                >
-                  <button
-                    onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
-                    className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-50 transition-colors font-semibold text-slate-800"
-                  >
-                    {item.question}
-                    <ChevronDown 
-                      className={`w-5 h-5 text-sky-500 transition-transform ${
-                        expandedId === item.id ? 'rotate-180' : ''
+      <section id="faq" className="px-6 py-20 md:py-28">
+        <div className="mx-auto max-w-4xl">
+          
+          {loading ? (
+            /* Skeleton Loading أثناء التحميل */
+            <div className="space-y-4">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-16 animate-pulse rounded-xl bg-slate-50 border border-slate-100" />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {faqItems.length === 0 ? (
+                <div className="py-10 text-center text-slate-500 italic bg-slate-50 rounded-2xl">
+                  Es gibt momentan keine FAQs.
+                </div>
+              ) : (
+                faqItems.map((item) => (
+                  <div key={item.id} className="group">
+                    {/* زر السؤال */}
+                    <button
+                      type="button"
+                      onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
+                      className={`flex w-full items-center justify-between rounded-xl px-6 py-5 text-left transition-all duration-300 shadow-sm ${
+                        expandedId === item.id 
+                        ? 'bg-[#E3F8FF] text-[#04264D] ring-1 ring-[#53D1FB]/30' 
+                        : 'bg-white border border-slate-100 text-[#04264D] hover:bg-[#F4FBFE]'
                       }`}
-                    />
-                  </button>
-                  {expandedId === item.id && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="px-6 py-4 bg-slate-50 border-t border-slate-200 text-slate-700 leading-relaxed"
                     >
-                      {item.answer}
-                    </motion.div>
-                  )}
-                </motion.div>
-              ))
-            )}
-          </div>
-        )
-        }
-      </div> */}
-    </section>
+                      <span className="text-lg font-bold pr-4 leading-snug">
+                        {item.question}
+                      </span>
+                      <div className={`p-1.5 rounded-full transition-all duration-300 ${
+                        expandedId === item.id ? 'bg-[#04264D] rotate-180' : 'bg-slate-100'
+                      }`}>
+                        <ChevronDown className={`h-4 w-4 ${
+                          expandedId === item.id ? 'text-white' : 'text-[#53D1FB]'
+                        }`} />
+                      </div>
+                    </button>
+
+                    {/* محتوى الإجابة مع أنيميشن سلس */}
+                    <AnimatePresence>
+                      {expandedId === item.id && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
+                          className="overflow-hidden"
+                        >
+                          {/* تم تحسين تباين النص ليتناسب مع خط Asul */}
+                          <div className="px-8 py-5 text-gray-700 font-normal leading-relaxed border-l-4 border-[#53D1FB] ml-4 my-2 bg-slate-50/50 rounded-r-xl">
+                            {item.answer}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* قسم التواصل السفلي */}
+      <section className="relative overflow-hidden bg-[#04264D] py-24 text-white">
+        <div className="mx-auto max-w-7xl px-6">
+           <ContactForm />
+        </div>
+      </section>
+    </div>
   );
 };
 

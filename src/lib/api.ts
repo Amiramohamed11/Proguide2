@@ -64,6 +64,13 @@ export interface Review {
   order: number;
 }
 
+export interface TeamMember {
+  id: number;
+  name: string;
+  image: string | null;
+  description: string;
+}
+
 // ================= API FUNCTIONS =================
 export const getSettings = async (): Promise<HeroSettings> => {
   try {
@@ -135,6 +142,18 @@ export const getReviews = async (): Promise<Review[]> => {
   }
 };
 
+export const getTeam = async (): Promise<TeamMember[]> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/team`); // تأكد من المسار الصحيح من الـ Backend
+    const data = response.data.data || response.data;
+    return Array.isArray(data) ? data : (data.team || []);
+  } catch (error) {
+    console.error("API Error - Team:", error);
+    return []; // أو أعد بيانات تجريبية (Mock Data)
+  }
+};
+
+
 export const submitContactForm = async (formData: {
   name: string;
   phone: string;
@@ -142,7 +161,7 @@ export const submitContactForm = async (formData: {
   message: string;
 }) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/contact`, formData);
+const response = await axios.post(`${API_BASE_URL}/contact/submit`, formData);
     return response.data;
   } catch (error) {
     console.error("API Error - Contact Form:", error);
@@ -158,5 +177,6 @@ export const api = {
   getGallery,
   getFaq,
  getReviews,
-  submitContactForm
+  submitContactForm,
+  getTeam
 };

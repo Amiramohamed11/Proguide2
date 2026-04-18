@@ -1,85 +1,123 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
-import logo from '../assets/logo.png' // تأكد من أن هذا هو مسار شعارك
+import logo from '../assets/logo.png';
 
 const Footer = () => {
-  return (
-     <footer className="bg-[#121640] text-white py-20 px-6 font-sans">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 items-start">
-        
-        {/* العمود الأول: الشعار (مكبر وبدون اسم)، النص، الأيقونات الاجتماعية */}
-        <div className="space-y-6 md:col-span-1">
-          <div className="pb-2"> {/* تم حذف اسم الشركة وزيادة حجم الشعار */}
-            <img src={logo} alt="Proaktiv Logo" className="w-40 h-auto" /> {/* تم زيادة العرض من w-24 إلى w-40 لتكبيره */}
+  const pageLinks = [
+    { label: 'Unsere Leistungen', to: '/services' },
+    { label: 'Karriere', to: '/karriere' },
+    { label: 'Unser Team', to: '/team' },
+    { label: 'Kontaktieren Sie uns', to: '/contact' },
+    { label: 'FAQ', to: '/faq' },
+    { label: 'Datenschutz', to: '/datenschutz' },
+    { label: 'Impressum', to: '/impressum' },
+  ];
+
+  return (
+    <footer className="w-full bg-[#0D1B3E] text-white h-auto md:h-[320px] flex items-center py-10 md:py-0 px-4 md:px-12 lg:px-20 font-['Roboto']">
+      <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 w-full items-start">
+        
+        {/* العمود الأول: الشعار والوصف */}
+        <div className="flex flex-col items-start text-left">
+          <div className="mb-4 transition-transform duration-300 hover:scale-105">
+            <img 
+              src={logo} 
+              alt="Proaktiv" 
+              className="h-auto w-[160px] object-contain" 
+            />
           </div>
           
-          <p className="text-slate-300 text-sm leading-relaxed">
-          Seit über [X] Jahren unterstützen wir Patienten mit Kompetenz und Einfühlungsvermögen. Unsere Physiotherapeuten begleiten Sie auf Ihrem Weg zu mehr Beweglichkeit und weniger Schmerzen.           
+          <p className="text-[12px] leading-relaxed text-gray-300 max-w-[300px] mb-6">
+            Seit über [X] Jahren unterstützen wir Patienten mit Kompetenz und Einfühlungsvermögen. 
+            Unsere Physiotherapeuten begleiten Sie auf Ihrem Weg.
           </p>
+          
+          {/* أيقونات التواصل الاجتماعي مع أكشن الهوفر */}
+          <div className="flex gap-4">
+            {[
+              { Icon: Facebook, href: "#" },
+              { Icon: Twitter, href: "#" },
+              { Icon: Linkedin, href: "#" },
+              { Icon: Instagram, href: "#" }
+            ].map((social, index) => (
+              <a 
+                key={index} 
+                href={social.href}
+                className="text-gray-400 hover:text-[#4DA8FF] transition-all duration-300 transform hover:-translate-y-1 hover:scale-110"
+              >
+                <social.Icon className="h-5 w-5 cursor-pointer" />
+              </a>
+            ))}
+          </div>
+        </div>
 
-          <div className="flex gap-4 pt-4">
-            {/* أيقونات التواصل الاجتماعي بيضاء وتتفاعل باللون الأزرق */}
-            <Facebook className="w-5 h-5 text-white hover:text-sky-500 cursor-pointer transition-colors" />
-            <Twitter className="w-5 h-5 text-white hover:text-sky-500 cursor-pointer transition-colors" />
-            <Linkedin className="w-5 h-5 text-white hover:text-sky-500 cursor-pointer transition-colors" />
-            <Instagram className="w-5 h-5 text-white hover:text-sky-500 cursor-pointer transition-colors" />
-          </div>
-        </div>
+        {/* العمود الثاني: الصفحات */}
+        <div className="flex flex-col items-start">
+          <h3 className="text-[16px] font-['Amiko'] font-bold mb-6 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-8 after:h-[2px] after:bg-[#4DA8FF]">
+            Seiten
+          </h3>
+          <ul className="space-y-2">
+            {pageLinks.map((item) => (
+              <li key={item.label}>
+                <Link 
+                  to={item.to} 
+                  className="text-[13px] text-gray-400 hover:text-white hover:pl-2 transition-all duration-300 ease-in-out block"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-        {/* العمود الثاني: فراغ مطابق لتوزيع الصورة */}
-        <div className="hidden md:block"></div>
-
-        {/* العمود الثالث: قائمة "Seiten" كاملة */}
-        <div>
-          <h3 className="text-lg font-bold mb-8 text-white">Seiten</h3>
-          <ul className="space-y-4 text-slate-300 text-sm">
-            <li className="hover:text-sky-500 cursor-pointer transition-colors">Unsere Leistungen</li>
-            <li className="hover:text-sky-500 cursor-pointer transition-colors">Karriere</li>
-            <li className="hover:text-sky-500 cursor-pointer transition-colors">Unser Team</li>
-            <li className="hover:text-sky-500 cursor-pointer transition-colors">Kontaktieren Sie uns</li>
-            <li className="hover:text-sky-500 cursor-pointer transition-colors">FAQ</li>
-            <li className="hover:text-sky-500 cursor-pointer transition-colors">Datenschutz</li>
-            <li className="hover:text-sky-500 cursor-pointer transition-colors">Impressum</li>
-          </ul>
-        </div>
-
-        {/* العمود الرابع: معلومات الاتصال الدقيقة */}
-        <div>
-          <h3 className="text-lg font-bold mb-8 text-white">Kontakt</h3>
-          <ul className="space-y-5 text-slate-300 text-sm">
-            {/* رقم الهاتف الأول */}
-            <li className="flex items-center gap-3">
-              <Phone className="w-4 h-4 text-sky-500" /> 
-              0202/2522648
+        {/* العمود الثالث: معلومات التواصل */}
+        <div className="flex flex-col items-start">
+          <h3 className="text-[16px] font-['Amiko'] font-bold mb-6 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-8 after:h-[2px] after:bg-[#4DA8FF]">
+            Kontakt
+          </h3>
+          <ul className="space-y-4">
+            {/* رقم الهاتف العادي */}
+            <li className="flex items-center gap-3 text-[13px] text-gray-400 hover:text-white transition-colors group cursor-pointer">
+              <Phone className="h-4 w-4 text-[#4DA8FF] group-hover:rotate-12 transition-transform" />
+              <span>0202/2522648</span>
             </li>
-
-            {/* رقم واتساب المميز باللون الأخضر */}
-            <li className="flex items-center gap-3">
-              <div className="w-5 h-5 rounded-full bg-[#25D366] flex items-center justify-center p-0.5">
-                <Phone className="w-3.5 h-3.5 text-white" />
-              </div>
-              +4915251856440
+            
+            {/* واتساب - أكشن فتح المحادثة مباشرة */}
+            <li>
+              <a 
+                href="https://wa.me/4915251856440" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 text-[13px] text-gray-400 hover:text-white transition-colors group"
+              >
+                <div className="bg-[#25D366] p-1 rounded-full shrink-0 group-hover:scale-110 group-hover:rotate-[15deg] transition-transform">
+                  <Phone className="h-3 w-3 text-white fill-current" />
+                </div>
+                <span>+4915251856440</span>
+              </a>
             </li>
-
+            
             {/* البريد الإلكتروني */}
-            <li className="flex items-center gap-3">
-              <Mail className="w-4 h-4 text-sky-500" /> 
-              proactive@gmail.com
+            <li className="flex items-center gap-3 text-[13px] text-gray-400 hover:text-white transition-colors group cursor-pointer">
+              <Mail className="h-4 w-4 text-[#4DA8FF] group-hover:scale-110 transition-transform" />
+              <span>proactive@gmail.com</span>
             </li>
-
-            {/* العنوان في سطرين */}
-            <li className="flex items-start gap-3">
-              <MapPin className="w-4 h-4 text-sky-500 mt-1 flex-shrink-0" /> 
-              <div className="flex flex-col gap-1">
+            
+            {/* العنوان */}
+            <li className="flex items-start gap-3 text-[13px] text-gray-400 hover:text-white transition-colors group cursor-pointer">
+              <MapPin className="h-4 w-4 text-[#4DA8FF] mt-0.5 group-hover:bounce transition-transform" />
+              <div className="flex flex-col leading-tight">
                 <span>Westkotter Str.</span>
                 <span>17342277 Wuppertal</span>
               </div>
             </li>
-          </ul>
-        </div>
-      </div>
-    </footer>
-  );
+          </ul>
+        </div>
+
+      </div>
+    </footer>
+  );
 };
 
 export default Footer;
