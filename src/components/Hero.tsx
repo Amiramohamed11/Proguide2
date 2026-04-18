@@ -25,7 +25,7 @@ const Hero = () => {
   if (loading) {
     return (
       <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-navy text-white">
-        Laden…
+        Loading....
       </div>
     );
   }
