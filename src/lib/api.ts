@@ -71,6 +71,18 @@ export interface TeamMember {
   description: string;
 }
 
+
+
+// أضف هذا الـ Interface في قسم الـ TYPES
+export interface ContactInfo {
+  address: string;
+  phone: string;
+  email: string;
+  opening_hours: { day: string; hours: string }[];
+  
+}
+
+
 // ================= API FUNCTIONS =================
 export const getSettings = async (): Promise<HeroSettings> => {
   try {
@@ -81,6 +93,8 @@ export const getSettings = async (): Promise<HeroSettings> => {
     return mockHeroSettings.data;
   }
 };
+
+
 
 export const getServices = async (): Promise<Service[]> => {
   try {
@@ -154,6 +168,16 @@ export const getTeam = async (): Promise<TeamMember[]> => {
 };
 
 
+export const getContactInfo = async (): Promise<ContactInfo | null> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/contact`); // لاحظ أن المسار هو /contact بناءً على الـ Postman
+    return response.data.data;
+  } catch (error) {
+    console.error("API Error - Contact Info:", error);
+    return null;
+  }
+};
+
 export const submitContactForm = async (formData: {
   name: string;
   phone: string;
@@ -178,5 +202,14 @@ export const api = {
   getFaq,
  getReviews,
   submitContactForm,
-  getTeam
+  getTeam,
+  getContactInfo
 };
+
+
+
+
+
+
+
+
