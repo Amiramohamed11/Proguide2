@@ -78,10 +78,9 @@ export interface ContactInfo {
   address: string;
   phone: string;
   email: string;
-  opening_hours: { day: string; hours: string }[];
-  
+  // تأكد من أن هذا يتطابق مع الـ JSON القادم من الـ API
+  opening_hours: { day: string; hours: string }[]; 
 }
-
 
 // ================= API FUNCTIONS =================
 export const getSettings = async (): Promise<HeroSettings> => {

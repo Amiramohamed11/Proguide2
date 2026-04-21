@@ -68,7 +68,7 @@ const Services = () => {
         <div className="flex flex-col gap-8">
           {loading ? (
             <div className="flex justify-center items-center h-64 font-amiko text-navy text-xl">
-              Laden...
+              Loading...
             </div>
           ) : (
             services.map((service, index) => (

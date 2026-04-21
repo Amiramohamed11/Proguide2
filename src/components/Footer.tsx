@@ -5,6 +5,7 @@ import { api } from '../lib/api';
 import logo from '../assets/logo.png';
 
 const Footer = () => {
+  // نقوم بتعريف الحالة لتخزين البيانات القادمة من الـ API
   const [contact, setContact] = useState(null);
 
   const pageLinks = [
@@ -20,8 +21,9 @@ const Footer = () => {
   useEffect(() => {
     const fetchContact = async () => {
       try {
-        const data = await api.getContactInfo();
-        setContact(data);
+        const response = await api.getContactInfo();
+        // نقوم بتخزين الـ data مباشرة (بناءً على هيكل الـ JSON الذي أرسلته)
+        setContact(response); 
       } catch (error) {
         console.error("Error fetching contact info:", error);
       }
@@ -39,8 +41,7 @@ const Footer = () => {
             <img src={logo} alt="Proaktiv" className="h-auto w-[160px] object-contain" />
           </div>
           <p className="text-[12px] leading-relaxed text-gray-300 max-w-[300px] mb-6">
-            Seit über Jahren unterstützen wir Patienten mit Kompetenz und Einfühlungsvermögen. 
-            Unsere Physiotherapeuten begleiten Sie auf Ihrem Weg.
+            {/* بقاء التصميم القديم كما هو */}
           </p>
           
           <div className="flex gap-4">
@@ -75,6 +76,12 @@ const Footer = () => {
         <div className="flex flex-col items-start">
           <h3 className="text-[16px] font-['Amiko'] font-bold mb-6 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-8 after:h-[2px] after:bg-[#4DA8FF]">Kontakt</h3>
           <ul className="space-y-4">
+            {/* إضافة العنوان */}
+            <li className="flex items-center gap-3 text-[13px] text-gray-400 hover:text-white transition-colors group cursor-pointer">
+              <MapPin className="h-4 w-4 text-[#4DA8FF]" />
+              <span>{contact?.address || "Laden..."}</span>
+            </li>
+            
             <li className="flex items-center gap-3 text-[13px] text-gray-400 hover:text-white transition-colors group cursor-pointer">
               <Phone className="h-4 w-4 text-[#4DA8FF] group-hover:rotate-12 transition-transform" />
               <span>{contact?.phone || "Laden..."}</span>
@@ -82,7 +89,7 @@ const Footer = () => {
             
             <li>
               <a href={`https://wa.me/${contact?.phone?.replace(/\s/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-[13px] text-gray-400 hover:text-white transition-colors group">
-                <div className="bg-[#25D366] p-1 rounded-full shrink-0 group-hover:scale-110 group-hover:rotate-[15deg] transition-transform">
+                <div className="bg-[#25D366] p-1 rounded-full shrink-0 group-hover:scale-110 transition-transform">
                   <Phone className="h-3 w-3 text-white fill-current" />
                 </div>
                 <span>{contact?.phone || "Laden..."}</span>
@@ -94,16 +101,16 @@ const Footer = () => {
               <span>{contact?.email || "Laden..."}</span>
             </li>
 
-            {/* جزء المواعيد */}
-<li className="mt-4 pt-4 border-t border-gray-700">
-  <h4 className="text-[14px] text-white font-semibold mb-2">Öffnungszeiten</h4>
-  {contact?.opening_hours?.map((item, index) => (
-    <div key={index} className="flex justify-between text-[12px] text-gray-400 mb-1 w-full max-w-[250px]">
-      <span>{item.day}</span>
-      <span className="text-white">{item.hours}</span>
-    </div>
-  ))}
-</li>
+            {/* جزء المواعيد المحدث */}
+            <li className="mt-4 pt-4 border-t border-gray-700">
+              <h4 className="text-[14px] text-white font-semibold mb-2">Öffnungszeiten</h4>
+              {contact?.opening_hours?.map((item, index) => (
+                <div key={index} className="flex justify-between text-[12px] text-gray-400 mb-1 w-full max-w-[250px]">
+                  <span>{item.day}</span>
+                  <span className="text-white">{item.hours}</span>
+                </div>
+              ))}
+            </li>
           </ul>
         </div>
       </div>
